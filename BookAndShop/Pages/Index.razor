@@ -1,10 +1,11 @@
 ﻿@page "/"
 @using BookAndShop.Models
+@using Microsoft.EntityFrameworkCore
 @inject IJSRuntime JSRuntime
 @inject MyDbContext context
 
 
-<div id="main">
+
 
 	<!-- Featured Post -->
 		<article class="post featured">
@@ -27,17 +28,17 @@
 
 	<!-- Posts -->
 		<section class="posts">
-			@foreach (var book in Books)
+			@foreach (Book book in Books)
 			{
 				<article>
 					<header>
-						<span class="date">April 24, 2017</span>
+						<span class="date">@(book.Date == null ? "" : book.Date.Value.ToString("dd MMMM, yyyy"))</span>
 						<h2><a href="#">@book.Title</a></h2>
 					</header>
-					<a href="#" class="image fit"><img src="images/pic02.jpg" alt="" /></a>
+					<a href="#" class="image fit"><img src="@book.Image.Path" alt="" /></a>
 					<p>@book.Description</p>
 					<ul class="actions special">
-						<li><a href="#" class="button">Full Story</a></li>
+						<li><a href="/book/@book.Id" class="button">Просмотр</a></li>
 					</ul>
 				</article>
 			}
@@ -58,14 +59,13 @@
 			</div>
 		</footer>
 
-</div>
 
 
 @code{
 	List<Book> Books { get; set; }
 	protected override void OnInitialized()
 	{
-		Books = context.Books.ToList();
+		Books = context.Books.Include(x => x.Image).ToList();
 	}
 
 	void Click()
