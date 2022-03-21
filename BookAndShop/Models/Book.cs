@@ -13,7 +13,7 @@ namespace BookAndShop.Models
         public int IdImage { get; set; }
         public int IdAuthor { get; set; }
 
-        public virtual Author IdAuthorNavigation { get; set; } = null!;
-        public virtual Image IdImageNavigation { get; set; } = null!;
+        public virtual Author Author { get; set; } = null!;
+        public virtual Image Image { get; set; } = null!;
     }
 }

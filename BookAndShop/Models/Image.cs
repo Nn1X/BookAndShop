@@ -11,8 +11,7 @@ namespace BookAndShop.Models
         }
 
         public int Id { get; set; }
-        public long? Size { get; set; }
-        public byte[] Data { get; set; } = null!;
+        public string? Path { get; set; }
 
         public virtual ICollection<Book> Books { get; set; }
     }

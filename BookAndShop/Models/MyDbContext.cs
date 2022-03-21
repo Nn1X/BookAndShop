@@ -56,16 +56,21 @@ namespace BookAndShop.Models
 
                 entity.Property(e => e.Title).HasColumnType("character varying");
 
-                entity.HasOne(d => d.IdAuthorNavigation)
+                entity.HasOne(d => d.Author)
                     .WithMany(p => p.Books)
                     .HasForeignKey(d => d.IdAuthor)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("fkey_Books_Id_Author");
 
-                entity.HasOne(d => d.IdImageNavigation)
+                entity.HasOne(d => d.Image)
                     .WithMany(p => p.Books)
                     .HasForeignKey(d => d.IdImage)
                     .HasConstraintName("fkey_Books_Id_Image");
+            });
+
+            modelBuilder.Entity<Image>(entity =>
+            {
+                entity.Property(e => e.Path).HasColumnType("character varying");
             });
 
             modelBuilder.Entity<Role>(entity =>
