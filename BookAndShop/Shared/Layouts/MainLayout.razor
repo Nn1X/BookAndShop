@@ -1,13 +1,59 @@
-﻿@inherits LayoutComponentBase
+﻿@using BookAndShop.LayoutServices
+@inherits LayoutComponentBase
 @inject NavigationManager navigationManager
 
 @*<PageTitle>BookAndShop</PageTitle>
 *@
 
+	
+	@if(CountService.Count<1)
+	{
+		<!-- Intro -->
+		<div id="intro">
+			<h1>
+				Book&Shop
+			</h1>
+			<p>
+				Самый крупный онлайн-магазин книг!
+			</p>
+			<ul class="actions">
+				<li><a @onclick="StartClick" href="/" class="button icon solid solo fa-arrow-down scrolly">Continue</a></li>
+			</ul>
+		</div>
 
-
-
-        
+		<!-- Header -->
+@*		 <header id="header" style="opacity:0">
+			<a class="logo">Book&Shop</a>
+		</header>*@
+	}
+	else{
+		@if(CountService.Count==1)
+		{
+			<div id="intro" style="animation-name: TitleCollapse; animation-duration: 1.5s; animation-fill-mode:forwards;">
+				<h1>
+					Book&Shop
+				</h1>
+				<p>
+					Самый крупный онлайн-магазин книг!
+				</p>
+				<ul class="actions">
+					<li><a @onclick="StartClick" href="/" class="button icon solid solo fa-arrow-down scrolly">Continue</a></li>
+				</ul>
+			</div> 
+			<!-- Header -->
+			 <header id="header" style="opacity:0">
+				<a class="logo">Book&Shop</a>
+			</header>
+		 
+		}
+		else{
+			<!-- Header -->
+			<header id="header" style="opacity:0; animation-name: HeaderVisible; animation-duration: 3s; animation-fill-mode:forwards;">
+				<a class="logo">Book&Shop</a>
+			</header>
+		}
+	}
+       
 
 		<!-- Nav -->
 		<nav id="nav">
@@ -50,8 +96,8 @@
 		@Body
 		</div>
 			<!-- Footer -->
-			@*<footer id="footer">
-				<section>
+			<footer id="footer">
+				@*<section>
 					<form method="post" action="#">
 						<div class="fields">
 							<div class="field">
@@ -71,7 +117,7 @@
 							<li><input type="submit" value="Send Message" /></li>
 						</ul>
 					</form>
-				</section>
+				</section>*@
 				<section class="split contact">
 					<section class="alt">
 						<h3>Address</h3>
@@ -99,7 +145,7 @@
 			</footer>
 
 		<!-- Copyright -->
-			<div id="copyright">
+@*			<div id="copyright">
 				<ul><li>&copy; Untitled</li><li>Design: <a href="https://html5up.net">HTML5 UP</a></li></ul>
 			</div>*@
 
@@ -111,6 +157,24 @@
 	{
 		Url = url;
 		navigationManager.NavigateTo(url);
+	}
+	protected override void OnInitialized()
+	{
+		CountService.Count = 0;
+	}
+
+	private async void StartClick()
+	{
+		CountService.Count++;
+		await Task.Run(() => IncCount());
+		//navigationManager.NavigateTo(Url);
+	}
+
+	void IncCount()
+	{
+		Thread.Sleep(2000);
+		CountService.Count++;
+		InvokeAsync(() => StateHasChanged());
 	}
 }
 

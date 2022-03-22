@@ -3311,7 +3311,7 @@ input, select, textarea {
 		cursor: default;
 		text-align: center;
 		z-index: 1;
-		min-height: 100vh;
+		min-height: 5vh;
 	}
 
 		#intro input, #intro select, #intro textarea {
@@ -3407,12 +3407,12 @@ input, select, textarea {
 				-webkit-transform: translateY(2rem);
 				-ms-transform: translateY(2rem);
 				transform: translateY(2rem);
-				opacity: 0;
-				visibility: hidden;
+				opacity: 1;
+				/*visibility: hidden;*/
 			}
 
 		#intro.hidden {
-			pointer-events: none;
+			/*	pointer-events: none;
 			-moz-transform: translateY(2rem);
 			-webkit-transform: translateY(2rem);
 			-ms-transform: translateY(2rem);
@@ -3420,9 +3420,13 @@ input, select, textarea {
 			-moz-transition: opacity 0.5s ease, -moz-transform 0.5s ease, visibility 0.5s;
 			-webkit-transition: opacity 0.5s ease, -webkit-transform 0.5s ease, visibility 0.5s;
 			-ms-transition: opacity 0.5s ease, -ms-transform 0.5s ease, visibility 0.5s;
-			transition: opacity 0.5s ease, transform 0.5s ease, visibility 0.5s;
-			opacity: 0;
-			visibility: hidden;
+			transition: opacity 0.5s ease, transform 0.5s ease, visibility 0.5s;*/
+			-moz-transform: translateY(0);
+			-webkit-transform: translateY(0);
+			-ms-transform: translateY(0);
+			transform: translateY(0);
+			opacity: 1;
+			/*visibility: hidden;*/
 		}
 
 			#intro.hidden + #header .logo {
@@ -4688,3 +4692,28 @@ input, select, textarea {
 		}
 
 	}
+
+
+	/*MY*/
+@keyframes TitleCollapse {
+	from {
+		opacity: 1;
+		visibility: visible;
+	}
+
+	to {
+		opacity: 0;
+		visibility:collapse;
+	}
+}
+@keyframes HeaderVisible {
+	from {
+		opacity: 0;
+		visibility: visible;
+	}
+
+	to {
+		opacity: 1;
+		visibility: collapse;
+	}
+}
