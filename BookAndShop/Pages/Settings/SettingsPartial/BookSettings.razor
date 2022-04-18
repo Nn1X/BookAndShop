@@ -1,0 +1,166 @@
+﻿@using BookAndShop.Models
+@using BookAndShop.Shared.Layouts
+@using DevExpress.Blazor
+@using System.Linq;
+@using Microsoft.EntityFrameworkCore;
+@using System.Globalization
+
+@inject MyDbContext Context;
+
+    <DxFormLayout ItemCaptionAlignment="ItemCaptionAlignment.None">
+    <DxFormLayoutGroup ColSpanMd="12" Decoration="FormLayoutGroupDecoration.None" >
+        <DxFormLayoutGroup ColSpanMd="12" Decoration="FormLayoutGroupDecoration.Card" >
+            <HeaderTemplate>
+                <div>
+                    <DxButton Text="Добавить" @onclick="(() => OnRowCreateStarting())" CssClass="header__button"/>
+                    <DxButton Text="Изменить" @onclick="(() => OnRowEditStarting((Book)SelectedItem))" CssClass="header__button"/>
+                    <DxButton Text="Удалить" @onclick="(() =>  Grid_DataItemDeleting((Book)SelectedItem))" CssClass="header__button"/>
+                </div>
+            </HeaderTemplate>
+            <Items>
+                <DxFormLayoutItem ColSpanMd="12" Context="GRID">
+                        <DxGrid @ref="grid"
+                            Data="Data"
+                            PageSize="12"
+                            KeyFieldName="Id"
+                            ValidationEnabled="true"
+                            EditModelSaving="Grid_EditModelSaving"
+                            AllowSelectRowByClick="true"
+                            EditMode="GridEditMode.EditForm"
+                            SelectionMode="GridSelectionMode.Single"
+                            @bind-SelectedDataItem="@SelectedItem">
+                        <Columns>
+                            <DxGridSelectionColumn Width="30px" />
+                            <DxGridDataColumn FieldName="Title" Caption="Название" MinWidth="80" />
+                            <DxGridDataColumn FieldName="Date" Caption="Дата" MinWidth="80" />
+                            <DxGridDataColumn FieldName="Author.Fio" Caption="Автор" MinWidth="100" />
+                            <DxGridDataColumn FieldName="Price" Caption="Цена" Width="150" />
+                            <DxGridDataColumn Caption="Картинка" Width="150px" >
+                                <CellDisplayTemplate>
+                                    @{
+                                        var bookItem = (context.DataItem as Book);
+                                    }
+                                    <a href="/image/@bookItem.Image.Id" target="_blank">@(bookItem.Image.Path.Replace("../../images/",""))</a>
+                                </CellDisplayTemplate>
+                            </DxGridDataColumn>
+                        </Columns>
+                        <EditFormTemplate Context="EditFormContext">
+                            @{
+                                var book = (Book)EditFormContext.EditModel??(new Book());
+                            }
+                            <DxFormLayout>
+                                <DxFormLayoutItem Caption="Название:" ColSpanXl="6" ColSpanLg="6" ColSpanXs="6">
+                                    <DxTextBox @bind-Text="@book.Title" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem Caption="Цена:" ColSpanXl="6" ColSpanLg="6" ColSpanXs="6">
+                                    <DxMaskedInput @bind-Value="@book.Price"
+                                       Mask="@NumericMask.Currency" >
+                                        <DxNumericMaskProperties Culture="@CultureInfo.GetCultureInfo("ru-RU")" />
+                                   </DxMaskedInput>     
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem Caption="Дата:" ColSpanXl="6" ColSpanLg="6" ColSpanXs="6">
+                                    <DxDateEdit @bind-Date="@book.Date" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem Caption="Автор:" ColSpanXl="6" ColSpanLg="6" ColSpanXs="6">
+                                    <DxComboBox Data="@Authors"
+                                        ListRenderMode="ListRenderMode.Virtual"
+                                        FilteringMode="DataGridFilteringMode.Contains"
+                                        TextFieldName="@nameof(Author.Fio)"
+                                        @bind-Value="@book.Author"
+                                        />
+                                </DxFormLayoutItem>
+
+                                <DxFormLayoutItem Caption="Картинка:" ColSpanXl="12" ColSpanLg="12" ColSpanXs="12">
+                                    <DxComboBox Data="@Images"
+                                        ListRenderMode="ListRenderMode.Virtual"
+                                        FilteringMode="DataGridFilteringMode.Contains"
+                                        TextFieldName="@nameof(Image.Path)"
+                                        @bind-Value="@book.Image"
+                                        />
+                                </DxFormLayoutItem>
+
+                                <DxFormLayoutItem Caption="Описание:" ColSpanXl="12" ColSpanLg="12" ColSpanXs="12">
+                                        <DxMemo @bind-Text="@book.Description"
+                                    Rows="5"/>
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem ColSpanMd="12">
+                                    <ValidationSummary />
+                                </DxFormLayoutItem>
+                            </DxFormLayout>
+                        </EditFormTemplate>
+                    </DxGrid>
+                </DxFormLayoutItem>
+            </Items>
+        </DxFormLayoutGroup>
+    </DxFormLayoutGroup>
+</DxFormLayout>
+
+@code {
+    readonly TaskCompletionSource<Book> firstBook = new (TaskCreationOptions.RunContinuationsAsynchronously);
+    IEnumerable<Book> Data { get; set; }
+    DxGrid grid{ get; set; }
+    List<Author> Authors{ get; set; }
+    List<Image> Images{ get; set; }
+    object SelectedItem{ get; set; }
+
+
+
+
+    protected override async Task OnInitializedAsync() {
+        Data = Context.Books.Include(x => x.Author).Include(x => x.Image).ToList();
+        Authors = Context.Authors.ToList();
+        Images = Context.Images.ToList();
+    }
+
+    void Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e) {
+        if(e.IsNew) {
+            var newBook = (Book)e.EditModel;
+            newBook.Title = "Новая книга";
+        }
+    }
+
+    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e) {
+        if(e.IsNew)
+        {
+            await Context.AddAsync<Book>((Book)e.EditModel);
+        }
+        else
+        {
+            FillDataItem((Book)e.EditModel, (Book)e.DataItem);
+            Context.Update<Book>((Book)e.DataItem);
+        }
+        await UpdateDataAsync();
+    }
+
+        async void OnRowEditStarting(Book book)
+        {
+            await grid.StartEditDataItemAsync(book);
+        }
+        async void OnRowCreateStarting()
+        {
+            await grid.StartEditNewRowAsync();
+        }
+
+     async Task Grid_DataItemDeleting(Book e) {
+        Context.Remove<Book>(e);
+        await UpdateDataAsync();
+    }
+
+    async Task UpdateDataAsync() {
+        Context.SaveChanges();
+        Data = Context.Books.Include(x => x.Author).Include(x => x.Image).ToList();
+        Authors = Context.Authors.ToList();
+        Images = Context.Images.ToList();
+    }
+
+    void FillDataItem(Book EditModel, Book DataItem)
+    {
+        DataItem.Title = EditModel.Title;
+        DataItem.Date = EditModel.Date;
+        DataItem.Author = EditModel.Author;
+        DataItem.Description = EditModel.Description;
+        DataItem.Image = EditModel.Image;
+        DataItem.Price = EditModel.Price;
+    }
+
+}

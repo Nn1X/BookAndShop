@@ -1,0 +1,34 @@
+﻿@page "/account"
+
+@using Microsoft.AspNetCore.Components.Authorization
+@using BookAndShop.Data
+@inject NavigationManager Navigation
+@inject TokenProvider TokenProvider
+@inject BookAndShopContext idContext
+
+<AuthorizeView>
+    <Authorized>
+        <div>
+            <p>
+                Авторизован @context.User.Identity.Name
+            </p>
+            <p>
+                 @idContext.Users.Where(x => x.Email ==  @context.User.Identity.Name).FirstOrDefault().Id.ToString();
+            </p>
+        </div>
+        @*<form action="/Identity/Account/Logout?returnUrl=%2F" method="post">
+            <button class="nav-link btn btn-link" type="submit">Logout</button>
+            <input name="__RequestVerificationToken" type="hidden"
+                   value="@TokenProvider.XsrfToken">
+        </form>*@
+    </Authorized>
+    <NotAuthorized>
+        <div>
+            <p>
+                Не авторизован
+            </p>
+        </div>
+        <a href="auth/reg">Register</a>
+        <a href="auth/login">Login</a>
+    </NotAuthorized>
+</AuthorizeView>

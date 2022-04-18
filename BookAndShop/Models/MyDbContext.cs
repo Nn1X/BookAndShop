@@ -73,33 +73,33 @@ namespace BookAndShop.Models
                 entity.Property(e => e.Path).HasColumnType("character varying");
             });
 
-            modelBuilder.Entity<Role>(entity =>
-            {
-                entity.Property(e => e.Name).HasColumnType("character varying");
-            });
+            //modelBuilder.Entity<Role>(entity =>
+            //{
+            //    entity.Property(e => e.Name).HasColumnType("character varying");
+            //});
 
-            modelBuilder.Entity<User>(entity =>
-            {
-                entity.Property(e => e.Address).HasColumnType("character varying");
+            //modelBuilder.Entity<User>(entity =>
+            //{
+            //    entity.Property(e => e.Address).HasColumnType("character varying");
 
-                entity.Property(e => e.Fio)
-                    .HasColumnType("character varying")
-                    .HasColumnName("FIO");
+            //    entity.Property(e => e.Fio)
+            //        .HasColumnType("character varying")
+            //        .HasColumnName("FIO");
 
-                entity.Property(e => e.IdRole)
-                    .ValueGeneratedOnAdd()
-                    .HasColumnName("Id_Role");
+            //    entity.Property(e => e.IdRole)
+            //        .ValueGeneratedOnAdd()
+            //        .HasColumnName("Id_Role");
 
-                entity.Property(e => e.Login).HasColumnType("character varying");
+            //    entity.Property(e => e.Login).HasColumnType("character varying");
 
-                entity.Property(e => e.Password).HasColumnType("character varying");
+            //    entity.Property(e => e.Password).HasColumnType("character varying");
 
-                entity.HasOne(d => d.IdRoleNavigation)
-                    .WithMany(p => p.Users)
-                    .HasForeignKey(d => d.IdRole)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("fkey_Users_Id_Role");
-            });
+            //    entity.HasOne(d => d.IdRoleNavigation)
+            //        .WithMany(p => p.Users)
+            //        .HasForeignKey(d => d.IdRole)
+            //        .OnDelete(DeleteBehavior.ClientSetNull)
+            //        .HasConstraintName("fkey_Users_Id_Role");
+            //});
 
             OnModelCreatingPartial(modelBuilder);
         }

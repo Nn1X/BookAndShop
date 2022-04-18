@@ -10,6 +10,10 @@
       "containerImage": "postgres",
       "type": "postgresql.container",
       "connectionId": "ConnectionString"
+    },
+    "mssql1": {
+      "type": "mssql.local",
+      "connectionId": "ConnectionStrings:BookAndShopContextConnection"
     }
   }
 }

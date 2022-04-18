@@ -1,0 +1,29 @@
+﻿@page "/settings"
+@using BookAndShop.Models
+@using BookAndShop.Shared.Layouts
+@using DevExpress.Blazor
+@using System.Linq;
+@using Microsoft.EntityFrameworkCore;
+@using System.Globalization
+
+@inject MyDbContext Context;
+
+<div class="MainSettings">
+    <DxTabs>
+        <DxTabPage Text="Книги">
+            <BookAndShop.Pages.Settings.SettingsPartial.BookSettings/>
+        </DxTabPage>
+        <DxTabPage Text="Авторы">
+            <BookAndShop.Pages.Settings.SettingsPartial.BookSettings/>
+        </DxTabPage>
+        <DxTabPage Text="Жанры">
+            <BookAndShop.Pages.Settings.SettingsPartial.BookSettings/>
+        </DxTabPage>
+        <DxTabPage Text="Картинки">
+            <BookAndShop.Pages.Settings.SettingsPartial.BookSettings/>
+        </DxTabPage>
+    </DxTabs>
+</div>
+
+
+

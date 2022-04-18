@@ -6,6 +6,10 @@
     "postgresql1": {
       "type": "postgresql",
       "connectionId": "ConnectionString"
+    },
+    "mssql1": {
+      "type": "mssql",
+      "connectionId": "ConnectionStrings:BookAndShopContextConnection"
     }
   }
 }
