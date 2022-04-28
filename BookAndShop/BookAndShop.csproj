@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="Pages\Books\Index.razor" />
     <None Include="Pages\Settings\Settings.razor" />
     <None Include="Pages\Settings\SettingsPartial\BookSettings.razor" />
     <None Include="wwwroot\css\bootstrap\bootstrap.min.css.map" />
