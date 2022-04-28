@@ -62,21 +62,29 @@
 		<!-- Nav -->
 		<nav id="nav">
 			<ul class="links">
-				@if(Url == "/")
+				@if(Url == "/" && active)
 				{
-					<li class="active"><a @onclick="@(x => urlChanged("/"))">Главная</a></li>
+					<li  class="active"><a href="/" @onclick="@(x => urlChanged("/"))">Главная</a></li>
 				}
 				else
 				{
-					<li><a @onclick="@(x => urlChanged("/"))">Главная</a></li>
+					<li><a href="/" @onclick="@(x => urlChanged("/"))">Главная</a></li>
 				}
-				@if(Url == "/generic")
+				@if(Url == "/generic" && active)
 				{
-					<li class="active"><a @onclick="@(x => urlChanged("/generic"))">Жанры</a></li>
+					<li  class="active"><a href="/generic" @onclick="@(x => urlChanged("/generic"))">Жанры</a></li>
 				}
 				else
 				{
-					<li><a @onclick="@(x => urlChanged("/generic"))">Жанры</a></li>
+					<li><a href="/generic" @onclick="@(x => urlChanged("/generic"))">Жанры</a></li>
+				}
+				@if(Url == "/books" && active)
+				{
+					<li class="active"><a href="/books" @onclick="@(x => urlChanged("/books"))">Книги</a></li>
+				}
+				else
+				{
+					<li><a href="/books" @onclick="@(x => urlChanged("/books"))">Книги</a></li>
 				}
 			</ul>
 			<ul class="icons">
@@ -189,7 +197,7 @@
 
 @code{
 	string Url { get; set; } = "/";
-
+	bool active{ get; set; }
 
 	void urlChanged(string url)
 	{
@@ -198,9 +206,15 @@
 	}
 	protected override void OnInitialized()
 	{
+		active = true;
 		CountService.Count = 0;
+	}
+
+	protected override bool ShouldRender()
+	{
 		Url = navigationManager.Uri.Remove(0, navigationManager.Uri.IndexOf("//")+2);
 		Url = Url.Remove(0, Url.IndexOf("/"));
+		return true;
 	}
 
 	private async void StartClick()
