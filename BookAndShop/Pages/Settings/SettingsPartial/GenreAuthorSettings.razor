@@ -1,0 +1,294 @@
+﻿@using BookAndShop.Models
+@using BookAndShop.Shared.Layouts
+@using DevExpress.Blazor
+@using System.Linq;
+@using Microsoft.EntityFrameworkCore;
+@using System.Globalization
+@using System.ComponentModel.DataAnnotations
+
+@inject MyDbContext Context;
+
+    <DxFormLayout ItemCaptionAlignment="ItemCaptionAlignment.None">
+    <DxFormLayoutGroup ColSpanMd="12" Decoration="FormLayoutGroupDecoration.None" >
+        <DxFormLayoutGroup ColSpanMd="12" Decoration="FormLayoutGroupDecoration.Card" >
+            <HeaderTemplate>
+                <div>
+                    <DxButton Text="Добавить" @onclick="(() => OnRowCreateStarting())" CssClass="header__button"/>
+                    <DxButton Text="Изменить" @onclick="(() => OnRowEditStarting((AuthorEdit)SelectedItem))" CssClass="header__button"/>
+                    <DxButton Text="Удалить" @onclick="(() =>  Grid_DataItemDeleting((AuthorEdit)SelectedItem))" CssClass="header__button"/>
+                </div>
+            </HeaderTemplate>
+            <Items>
+                <DxFormLayoutItem ColSpanMd="12" Context="GRID">
+                        <DxGrid @ref="grid"
+                            Data="Data"
+                            PageSize="12"
+                            KeyFieldName="AuthorId"
+                            ValidationEnabled="true"
+                            EditModelSaving="Grid_EditModelSaving"
+                            AllowSelectRowByClick="true"
+                            EditMode="GridEditMode.EditForm"
+                            SelectionMode="GridSelectionMode.Single"
+                            @bind-SelectedDataItem="@SelectedItem"
+                            EditFormButtonsVisible=false>
+                        <Columns>
+                            <DxGridDataColumn Caption="ID" Width="150px" >
+                                <CellDisplayTemplate>
+                                    @{
+                                        var index = (context.VisibleIndex);
+                                    }
+                                    <div>@(index+1)</div>
+                                </CellDisplayTemplate>
+                            </DxGridDataColumn>
+                            <DxGridDataColumn FieldName="Surname" Caption="Фамилия" MinWidth="80" />
+                            <DxGridDataColumn FieldName="Name" Caption="Имя" MinWidth="80" />
+                            <DxGridDataColumn FieldName="Patronymic" Caption="Отчество" MinWidth="80" />
+                        </Columns>
+                        <EditFormTemplate Context="EditFormContext">
+                            @{
+                                var author = (AuthorEdit)EditFormContext.EditModel??(new AuthorEdit());
+                            }
+                            <DxFormLayout>
+                                <DxFormLayoutItem Caption="Фамилия:" ColSpanXl="6" ColSpanLg="6" ColSpanXs="6" Context="FormLayoutContext">
+                                    <DxTextBox @bind-Text="@author.Surname" />
+                                </DxFormLayoutItem>
+       
+                                <DxFormLayoutItem Caption="Имя:" ColSpanXl="6" ColSpanLg="6" ColSpanXs="6" Context="FormLayoutContext">
+                                    <DxTextBox @bind-Text="@author.Name" />
+                                </DxFormLayoutItem>
+                                
+                                <DxFormLayoutItem Caption="Отчество:" ColSpanXl="12" ColSpanLg="12" ColSpanXs="12" Context="FormLayoutContext">
+                                    <DxTextBox @bind-Text="@author.Patronymic" />
+                                </DxFormLayoutItem>
+
+                                <DxFormLayoutItem ColSpanMd="12" Context="FormLayoutContext">
+                                    <ValidationSummary />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem ColSpanMd="12" Context="FormLayoutContext">
+                                    <div class="text-right">
+                                        <DxButton RenderStyle="ButtonRenderStyle.Primary" SubmitFormOnClick="true" Text="Принять" />
+                                        <DxButton RenderStyle="ButtonRenderStyle.Link" Click="GenreGrid_OnCancelButtonClick" Text="Отменить" />
+                                    </div>
+                                </DxFormLayoutItem>
+                            </DxFormLayout>
+                        </EditFormTemplate>
+                    </DxGrid>
+                </DxFormLayoutItem>
+            </Items>
+        </DxFormLayoutGroup>
+    </DxFormLayoutGroup>
+    
+    <DxFormLayoutGroup ColSpanMd="12" Decoration="FormLayoutGroupDecoration.None" >
+        <DxFormLayoutGroup ColSpanMd="12" Decoration="FormLayoutGroupDecoration.Card" >
+            <HeaderTemplate>
+                <div>
+                    <DxButton Text="Добавить" @onclick="(() => OnRowCreateGenreStarting())" CssClass="header__button"/>
+                    <DxButton Text="Изменить" @onclick="(() => OnRowEditGenreStarting((Genre)SelectedGenre))" CssClass="header__button"/>
+                    <DxButton Text="Удалить" @onclick="(() =>  Grid_GenreDataItemDeleting((Genre)SelectedGenre))" CssClass="header__button"/>
+                </div>
+            </HeaderTemplate>
+            <Items>
+                <DxFormLayoutItem ColSpanMd="12" Context="GGRID">
+                        <DxGrid @ref="GenreGrid"
+                            Data="GenresData"
+                            PageSize="12"
+                            KeyFieldName="Id"
+                            ValidationEnabled="true"
+                            EditModelSaving="Grid_GenreEditModelSaving"
+                            AllowSelectRowByClick="true"
+                            EditMode="GridEditMode.EditForm"
+                            SelectionMode="GridSelectionMode.Single"
+                            @bind-SelectedDataItem="@SelectedGenre"
+                            EditFormButtonsVisible=false>
+                        <Columns>
+                            <DxGridDataColumn Caption="ID" Width="150px" >
+                                <CellDisplayTemplate>
+                                    @{
+                                        var index = (context.VisibleIndex);
+                                    }
+                                    <div>@(index+1)</div>
+                                </CellDisplayTemplate>
+                            </DxGridDataColumn>
+                            <DxGridDataColumn FieldName="Name" Caption="Название" MinWidth="80" />
+                        </Columns>
+                        <EditFormTemplate Context="GenreEditFormContext">
+                            @{
+                                var genre = (Genre)GenreEditFormContext.EditModel??(new Genre());
+                            }
+                            <DxFormLayout>
+                                <DxFormLayoutItem Caption="Название:" ColSpanXl="12" ColSpanLg="12" ColSpanXs="12" Context="GenreFormLayoutContext">
+                                    <DxTextBox @bind-Text="@genre.Name" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem ColSpanMd="12" Context="GenreFormLayoutContext">
+                                    <ValidationSummary />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem ColSpanMd="12" Context="GenreFormLayoutContext">
+                                    <div class="text-right">
+                                        <DxButton RenderStyle="ButtonRenderStyle.Primary" SubmitFormOnClick="true" Text="Принять" />
+                                        <DxButton RenderStyle="ButtonRenderStyle.Link" Click="GenreGrid_OnCancelButtonClick" Text="Отменить" />
+                                    </div>
+                                </DxFormLayoutItem>
+                            </DxFormLayout>
+                        </EditFormTemplate>
+                    </DxGrid>
+                </DxFormLayoutItem>
+            </Items>
+        </DxFormLayoutGroup>
+    </DxFormLayoutGroup>
+</DxFormLayout>
+
+@code {
+    readonly TaskCompletionSource<Book> firstBook = new (TaskCreationOptions.RunContinuationsAsynchronously);
+    List<AuthorEdit> Data { get; set; }
+    DxGrid grid{ get; set; }
+    object SelectedItem{ get; set; }
+
+
+    class AuthorEdit
+    {
+        public int AuthorId{ get; set; }
+        [Required(ErrorMessage = "Фамилия обязательна!")]
+        public string Surname{ get; set; }
+        [Required(ErrorMessage = "Отчество обязательно!")]
+        public string Patronymic{ get; set; }
+        [Required(ErrorMessage = "Имя обязательно!")]
+        public string Name{ get; set; }
+    }
+
+
+    protected override async Task OnInitializedAsync() {
+        var data = Context.Authors.ToList();
+        Data = new List<AuthorEdit>();
+        foreach (var item in data)
+        {
+            var auth = new AuthorEdit();
+            auth.AuthorId = item.Id;
+            auth.Surname = item.Fio.Remove(item.Fio.IndexOf(" "));
+            auth.Name = item.Fio.Replace(auth.Surname + " ", "").Remove(item.Fio.Replace(auth.Surname + " ", "").IndexOf(" "));
+            auth.Patronymic = item.Fio.Replace(auth.Surname + " " + auth.Name + " ", "");
+
+            Data.Add(auth);
+        }
+
+        GenresData = Context.Genres.ToList();
+    }
+
+    void Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e) {
+        if(e.IsNew) {
+            var newAuth = (AuthorEdit)e.EditModel;
+        }
+    }
+
+    async Task Grid_EditModelSaving(GridEditModelSavingEventArgs e) 
+    {
+        if(e.IsNew)
+        {
+            var auth = FillDataItem((AuthorEdit)e.EditModel);
+            await Context.AddAsync<Author>(auth);
+        }
+        else
+        {
+            var auth = FillDataItem((AuthorEdit)e.EditModel);
+            Context.Update<Author>(auth);
+        }
+        await UpdateDataAsync();
+    }
+
+    async void OnRowEditStarting(AuthorEdit auth)
+    {
+        await grid.StartEditDataItemAsync(auth);
+    }
+    async void OnRowCreateStarting()
+    {
+        await grid.StartEditNewRowAsync();
+    }
+
+    async Task Grid_DataItemDeleting(AuthorEdit e) {
+
+        var auth = Context.Authors.Where(x => x.Id == e.AuthorId).FirstOrDefault();
+        Context.Remove<Author>(auth);
+        await UpdateDataAsync();
+    }
+
+    async Task UpdateDataAsync() {
+        Context.SaveChanges();
+        var data = Context.Authors.ToList();
+        foreach (var item in data)
+        {
+            Data = new List<AuthorEdit>();
+
+            var auth = new AuthorEdit();
+            auth.Surname = item.Fio.Remove(item.Fio.IndexOf(" "));
+            auth.Name = item.Fio.Replace(auth.Surname + " ", "").Remove(item.Fio.Replace(auth.Surname + " ", "").IndexOf(" "));
+            auth.Patronymic = item.Fio.Replace(auth.Surname + " " + auth.Name + " ", "");
+
+            Data.Add(auth);
+        }
+    }
+
+    Author FillDataItem(AuthorEdit EditModel)
+    {
+        var DataItem = (Context.Authors.Where(x => x.Id == EditModel.AuthorId).FirstOrDefault()) ?? new Author();
+        DataItem.Fio = EditModel.Surname + " " + EditModel.Name + " " + EditModel.Patronymic;
+        return DataItem;
+    }
+
+    async Task Grid_OnCancelButtonClick()
+    {
+        await grid.CancelEditAsync();
+    }
+
+    //Genres
+    List<Genre> GenresData { get; set; }
+    DxGrid GenreGrid{ get; set; }
+    object SelectedGenre{ get; set; }
+
+    async void OnRowCreateGenreStarting()
+    {
+        await GenreGrid.StartEditNewRowAsync();
+    }
+
+    async void OnRowEditGenreStarting(Genre genre)
+    {
+        await GenreGrid.StartEditDataItemAsync(genre);
+    }
+
+    async Task Grid_GenreDataItemDeleting(Genre genre) {
+        Context.Remove<Genre>(genre);
+        await UpdateGenreDataAsync();
+    }
+
+    async Task UpdateGenreDataAsync()
+    {
+        GenresData = Context.Genres.ToList();
+    }
+    //TODO: хуита какая-то с сохранением
+    async Task Grid_GenreEditModelSaving(GridEditModelSavingEventArgs e) 
+    {
+        if(e.IsNew)
+        {
+            var genre = FillDataItem((Genre)e.EditModel);
+            await Context.AddAsync<Genre>(genre);
+        }
+        else
+        {
+            var genre = FillDataItem((Genre)e.EditModel);
+            Context.Update<Genre>(genre);
+        }
+        Context.SaveChanges();
+        await UpdateGenreDataAsync();
+    }
+
+    Genre FillDataItem(Genre EditModel)
+    {
+        var DataItem = (Context.Genres.Where(x => x.Id == EditModel.Id).FirstOrDefault()) ?? new Genre();
+        DataItem.Id = Context.Genres.OrderByDescending(x => x.Id).FirstOrDefault()?.Id ?? 0 + 1; 
+        DataItem.Name = EditModel.Name;
+        return DataItem;
+    }
+
+    async Task GenreGrid_OnCancelButtonClick()
+    {
+        await GenreGrid.CancelEditAsync();
+    }
+}

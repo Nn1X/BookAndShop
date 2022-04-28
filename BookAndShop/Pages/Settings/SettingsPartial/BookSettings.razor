@@ -28,9 +28,9 @@
                             AllowSelectRowByClick="true"
                             EditMode="GridEditMode.EditForm"
                             SelectionMode="GridSelectionMode.Single"
-                            @bind-SelectedDataItem="@SelectedItem">
+                            @bind-SelectedDataItem="@SelectedItem"
+                            EditFormButtonsVisible=false>
                         <Columns>
-                            <DxGridSelectionColumn Width="30px" />
                             <DxGridDataColumn FieldName="Title" Caption="Название" MinWidth="80" />
                             <DxGridDataColumn FieldName="Date" Caption="Дата" MinWidth="80" />
                             <DxGridDataColumn FieldName="Author.Fio" Caption="Автор" MinWidth="100" />
@@ -40,7 +40,7 @@
                                     @{
                                         var bookItem = (context.DataItem as Book);
                                     }
-                                    <a href="/image/@bookItem.Image.Id" target="_blank">@(bookItem.Image.Path.Replace("../../images/",""))</a>
+                                    <a href="/image/@bookItem.Image.Id" target="_blank">@(bookItem.Image.Path.Replace("../../images/forBook/",""))</a>
                                 </CellDisplayTemplate>
                             </DxGridDataColumn>
                         </Columns>
@@ -49,19 +49,19 @@
                                 var book = (Book)EditFormContext.EditModel??(new Book());
                             }
                             <DxFormLayout>
-                                <DxFormLayoutItem Caption="Название:" ColSpanXl="6" ColSpanLg="6" ColSpanXs="6">
+                                <DxFormLayoutItem Caption="Название:" ColSpanXl="6" ColSpanLg="6" ColSpanXs="6" Context="Book_FormLayoutContext">
                                     <DxTextBox @bind-Text="@book.Title" />
                                 </DxFormLayoutItem>
-                                <DxFormLayoutItem Caption="Цена:" ColSpanXl="6" ColSpanLg="6" ColSpanXs="6">
+                                <DxFormLayoutItem Caption="Цена:" ColSpanXl="6" ColSpanLg="6" ColSpanXs="6" Context="Book_FormLayoutContext">
                                     <DxMaskedInput @bind-Value="@book.Price"
                                        Mask="@NumericMask.Currency" >
                                         <DxNumericMaskProperties Culture="@CultureInfo.GetCultureInfo("ru-RU")" />
                                    </DxMaskedInput>     
                                 </DxFormLayoutItem>
-                                <DxFormLayoutItem Caption="Дата:" ColSpanXl="6" ColSpanLg="6" ColSpanXs="6">
+                                <DxFormLayoutItem Caption="Дата:" ColSpanXl="6" ColSpanLg="6" ColSpanXs="6" Context="Book_FormLayoutContext">
                                     <DxDateEdit @bind-Date="@book.Date" />
                                 </DxFormLayoutItem>
-                                <DxFormLayoutItem Caption="Автор:" ColSpanXl="6" ColSpanLg="6" ColSpanXs="6">
+                                <DxFormLayoutItem Caption="Автор:" ColSpanXl="6" ColSpanLg="6" ColSpanXs="6" Context="Book_FormLayoutContext">
                                     <DxComboBox Data="@Authors"
                                         ListRenderMode="ListRenderMode.Virtual"
                                         FilteringMode="DataGridFilteringMode.Contains"
@@ -70,7 +70,7 @@
                                         />
                                 </DxFormLayoutItem>
 
-                                <DxFormLayoutItem Caption="Картинка:" ColSpanXl="12" ColSpanLg="12" ColSpanXs="12">
+                                <DxFormLayoutItem Caption="Картинка:" ColSpanXl="12" ColSpanLg="12" ColSpanXs="12" Context="Book_FormLayoutContext">
                                     <DxComboBox Data="@Images"
                                         ListRenderMode="ListRenderMode.Virtual"
                                         FilteringMode="DataGridFilteringMode.Contains"
@@ -79,12 +79,18 @@
                                         />
                                 </DxFormLayoutItem>
 
-                                <DxFormLayoutItem Caption="Описание:" ColSpanXl="12" ColSpanLg="12" ColSpanXs="12">
+                                <DxFormLayoutItem Caption="Описание:" ColSpanXl="12" ColSpanLg="12" ColSpanXs="12" Context="Book_FormLayoutContext">
                                         <DxMemo @bind-Text="@book.Description"
                                     Rows="5"/>
                                 </DxFormLayoutItem>
-                                <DxFormLayoutItem ColSpanMd="12">
+                                <DxFormLayoutItem ColSpanMd="12" Context="Book_FormLayoutContext">
                                     <ValidationSummary />
+                                </DxFormLayoutItem>
+                                 <DxFormLayoutItem ColSpanMd="12" Context="Book_FormLayoutContext">
+                                    <div class="text-right">
+                                        <DxButton RenderStyle="ButtonRenderStyle.Primary" SubmitFormOnClick="true" Text="Принять" />
+                                        <DxButton RenderStyle="ButtonRenderStyle.Link" Click="Grid_OnCancelButtonClick" Text="Отменить" />
+                                    </div>
                                 </DxFormLayoutItem>
                             </DxFormLayout>
                         </EditFormTemplate>
@@ -163,4 +169,8 @@
         DataItem.Price = EditModel.Price;
     }
 
+    async Task Grid_OnCancelButtonClick()
+    {
+        await grid.CancelEditAsync();
+    }
 }
