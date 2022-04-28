@@ -1,75 +1,29 @@
 ﻿@page "/"
-@using BookAndShop.Models
-@using Microsoft.EntityFrameworkCore
-@inject IJSRuntime JSRuntime
-@inject MyDbContext context
+@inject NavigationManager navigationManager
 
 
-
+	
 
 	<!-- Featured Post -->
 		<article class="post featured">
 			<header class="major">
-				<span class="date">April 25, 2017</span>
-				<h2><a href="#">And this is a<br />
-				massive headline</a></h2>
-				<p>Aenean ornare velit lacus varius enim ullamcorper proin aliquam<br />
-				facilisis ante sed etiam magna interdum congue. Lorem ipsum dolor<br />
-				amet nullam sed etiam veroeros.</p>
+				<span class="date">Онлайн-магазин книг</span>
+				<h2><a>Book&Shop<br /></a></h2>
+				<p>Мы один из крупнейших магазинов книг России,<br /> в нашем асортименте вы найдете любую книгу на любом из языков мира!</p>
+				<p>Для партнеров<br /> контанкты указаны ниже, свяжитесь с нами любым удобным способом.</p>
 			</header>
-			<a href="#" class="image main"><img src="images/pic01.jpg" alt="" /></a>
+			<a class="image main"><img src="" alt="" /></a>
 			<ul class="actions special">
-				<li><a href="#" class="button large">Full Story</a></li>
+				<li><a @onclick="@(x => urlChanged("/books"))" class="button large">К книгам!</a></li>
 			</ul>
-
-			<button @onclick="@Click">CLICK</button>
-
 		</article>
-
-	<!-- Posts -->
-		<section class="posts">
-			@foreach (Book book in Books)
-			{
-				<article>
-					<header>
-						<span class="date">@(book.Date == null ? "" : book.Date.Value.ToString("dd MMMM, yyyy"))</span>
-						<h2><a href="#">@book.Title</a></h2>
-					</header>
-					<a href="#" class="image fit"><img src="@book.Image.Path" alt="" /></a>
-					<p>@book.Description</p>
-					<ul class="actions special">
-						<li><a href="/book/@book.Id" class="button">Просмотр</a></li>
-					</ul>
-				</article>
-			}
-		</section>
-
-	<!-- Footer -->
-		<footer>
-			<div class="pagination">
-				<!--<a href="#" class="previous">Prev</a>-->
-				<a href="#" class="page active">1</a>
-				<a href="#" class="page">2</a>
-				<a href="#" class="page">3</a>
-				<span class="extra">&hellip;</span>
-				<a href="#" class="page">8</a>
-				<a href="#" class="page">9</a>
-				<a href="#" class="page">10</a>
-				<a href="#" class="next">Next</a>
-			</div>
-		</footer>
 
 
 
 @code{
-	List<Book> Books { get; set; }
-	protected override void OnInitialized()
+	void urlChanged(string url)
 	{
-		Books = context.Books.Include(x => x.Image).ToList();
-	}
-
-	void Click()
-	{
-		JSRuntime.InvokeAsync<object>("alert", "Не выбран реестр для просмотра");
+		var Url = url;
+		navigationManager.NavigateTo(url);
 	}
 }

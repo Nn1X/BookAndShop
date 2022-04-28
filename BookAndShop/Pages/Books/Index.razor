@@ -1,0 +1,59 @@
+﻿@page "/books"
+@using BookAndShop.Models
+@using BookAndShop.Pages.Shared
+@using Microsoft.EntityFrameworkCore
+@inject IJSRuntime JSRuntime
+@inject MyDbContext context
+
+
+
+	<!-- Posts -->
+		<section class="posts">
+			@foreach (Book book in Books)
+			{
+				<article>
+					<header>
+						<span class="date">@(book.Date == null ? "" : book.Date.Value.ToString("dd MMMM, yyyy"))</span>
+						<h2><a href="/book/@book.Id">@book.Title</a></h2>
+					</header>
+					<a href="/book/@book.Id" class="image fit"><img src="@book.Image.Path" alt="" /></a>
+					<p>@book.Description</p>
+					<ul class="actions special">
+						<li><a href="/book/@book.Id" class="button">Просмотр</a></li>
+					</ul>
+				</article>
+			}
+		</section>
+
+	<!-- Footer -->
+		<footer>
+			<Pagination TotaPagesQuantity="totalPageQuantity" CurrentPage="currentPage" Radius="1"
+            SelectedPage="SelectedPage"></Pagination>
+		</footer>
+
+
+
+@code{
+	List<Book> Books { get; set; }
+	private int totalPageQuantity;
+	private int currentPage = 1;
+
+	protected override void OnInitialized()
+	{
+		LoadBooks();
+	}
+
+	private async Task SelectedPage(int page)
+	{
+		currentPage = page;
+		await LoadBooks(page);
+	}
+
+	async Task LoadBooks(int page = 1, int quantityPerPage = 1)
+	{
+		var ceiling = Math.Ceiling(Convert.ToDouble(context.Books.Count()) / quantityPerPage);
+		totalPageQuantity = Convert.ToInt32(ceiling);
+
+		Books = context.Books.Include(x => x.Image).Include(x => x.Genres).AsQueryable().Skip((page-1) * quantityPerPage).Take(quantityPerPage).ToList();
+	}
+}
