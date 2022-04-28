@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using BookAndShop.Data;
 using BookAndShop.Areas.Identity;
 using DevExpress.Blazor;
+using BookAndShop.Extentions;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseWebRoot("wwwroot").UseStaticWebAssets();
@@ -17,7 +18,7 @@ var connectionString = builder.Configuration.GetConnectionString("BookAndShopCon
     options.Password.RequireLowercase = false; // требуются ли символы в нижнем регистре
     options.Password.RequireUppercase = false; // требуются ли символы в верхнем регистре
     options.Password.RequireDigit = false; // требуются ли цифры
-    }).AddRoles<IdentityRole>().AddEntityFrameworkStores<BookAndShopContext>();
+    }).AddErrorDescriber<RuIdentityErrorDescriber>().AddRoles<IdentityRole>().AddEntityFrameworkStores<BookAndShopContext>();
 // Add services to the container.
 
 builder.Services.AddDbContext<MyDbContext>(options =>
