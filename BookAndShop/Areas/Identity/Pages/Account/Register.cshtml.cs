@@ -75,7 +75,7 @@ namespace BookAndShop.Areas.Identity.Pages.Account
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
-            [Required]
+            [Required(ErrorMessage = "Email обязателен")]
             [EmailAddress]
             [Display(Name = "Email")]
             public string Email { get; set; }
@@ -84,7 +84,7 @@ namespace BookAndShop.Areas.Identity.Pages.Account
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
-            [Required]
+            [Required(ErrorMessage = "Пароль обязателен")]
             [StringLength(100, ErrorMessage = "Пароль должен содержать не менее пяти символов", MinimumLength = 5)]
             [DataType(DataType.Password)]
             [Display(Name = "Password")]

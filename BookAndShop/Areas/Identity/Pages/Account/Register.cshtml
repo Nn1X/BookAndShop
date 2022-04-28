@@ -12,12 +12,6 @@
 						Регистрация
 					</span>
 
-					<span class="txt1 p-b-11" style="margin: 0 auto; color:red; display: block;">
-						<span asp-validation-for="Input.Email" style="color:red;" class="text-danger"></span>
-						<span asp-validation-for="Input.Password" style="color:red;" class="text-danger"></span>
-						<span asp-validation-for="Input.ConfirmPassword" style="color:red;" class="text-danger"></span>
-					</span>
-
 					<span class="txt1 p-b-11" style="display: block;">
 						Логин
 					</span>
@@ -37,7 +31,7 @@
 					</div>
 					
 					<span class="txt1 p-b-11">
-						Потрите пароль
+						Повторите пароль
 					</span>
 					<div class="wrap-input100 validate-input m-b-12" data-validate = "Password is required">
 		@*				<span class="btn-show-pass" @onclick="ShowPass">
@@ -46,6 +40,12 @@
 						<input asp-for="Input.ConfirmPassword" style="border:0px!important;" class="input100" autocomplete="current-password" aria-required="true" />
 						<span class="focus-input100"></span>
 					</div>
+
+					<span class="txt1 p-b-11" style="margin: 0 auto; color:red; display: block;">
+						<span asp-validation-for="Input.Email" style="display:inline-block; color:red;" class="text-danger"></span>
+						<span asp-validation-for="Input.Password" style="display:inline-block; color:red;" class="text-danger"></span>
+						<span asp-validation-for="Input.ConfirmPassword" style="display:inline-block; color:red;" class="text-danger"></span>
+					</span>
 
 					<div class="container-login100-form-btn" style="margin-top:10px;">
 						<button id="registerSubmit" type="submit" class="login100-form-btn">

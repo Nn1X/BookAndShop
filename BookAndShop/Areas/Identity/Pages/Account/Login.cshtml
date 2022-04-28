@@ -13,11 +13,6 @@
 						Авторизация
 					</span>
 
-					<span class="txt1 p-b-11" style="margin: 0 auto; color:red; display: block;">
-						<span asp-validation-for="Input.Email" style="color:red;" class="text-danger"></span>
-						<span asp-validation-for="Input.Password" style="color:red;" class="text-danger"></span>
-					</span>
-
 					<span class="txt1 p-b-11">
 						Логин
 					</span>
@@ -34,7 +29,13 @@
 						</span>*@
 						<input asp-for="Input.Password" style="border:0px!important;" class="input100" autocomplete="current-password" aria-required="true" />
 						<span class="focus-input100"></span>
-					</div>
+					</div
+
+					<span class="txt1 p-b-11" style="margin: 0 auto; color:red; display: block;">
+						@*<span asp-validation-for="Input.Email" style="color:red;" class="text-danger"></span>*@
+						@*<span asp-validation-for="Input.Password" style="color:red;" class="text-danger"></span>*@
+						<div asp-validation-summary="All" class="text-danger"></div>
+					</span>
 					
 					<div class="flex-sb-m w-full p-b-48">
 						<div class="contact100-form-checkbox"></div>
