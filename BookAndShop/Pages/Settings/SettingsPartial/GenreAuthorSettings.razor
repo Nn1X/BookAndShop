@@ -67,7 +67,7 @@
                                 <DxFormLayoutItem ColSpanMd="12" Context="FormLayoutContext">
                                     <div class="text-right">
                                         <DxButton RenderStyle="ButtonRenderStyle.Primary" SubmitFormOnClick="true" Text="Принять" />
-                                        <DxButton RenderStyle="ButtonRenderStyle.Link" Click="GenreGrid_OnCancelButtonClick" Text="Отменить" />
+                                        <DxButton RenderStyle="ButtonRenderStyle.Link" Click="Grid_OnCancelButtonClick" Text="Отменить" />
                                     </div>
                                 </DxFormLayoutItem>
                             </DxFormLayout>
@@ -149,7 +149,7 @@
         public int AuthorId{ get; set; }
         [Required(ErrorMessage = "Фамилия обязательна!")]
         public string Surname{ get; set; }
-        [Required(ErrorMessage = "Отчество обязательно!")]
+
         public string Patronymic{ get; set; }
         [Required(ErrorMessage = "Имя обязательно!")]
         public string Name{ get; set; }
@@ -212,18 +212,20 @@
 
     async Task UpdateDataAsync() {
         Context.SaveChanges();
+        SelectedItem = null;
         var data = Context.Authors.ToList();
+        var tempData = new List<AuthorEdit>();
         foreach (var item in data)
         {
-            Data = new List<AuthorEdit>();
-
             var auth = new AuthorEdit();
+            auth.AuthorId = item.Id;
             auth.Surname = item.Fio.Remove(item.Fio.IndexOf(" "));
             auth.Name = item.Fio.Replace(auth.Surname + " ", "").Remove(item.Fio.Replace(auth.Surname + " ", "").IndexOf(" "));
             auth.Patronymic = item.Fio.Replace(auth.Surname + " " + auth.Name + " ", "");
 
-            Data.Add(auth);
+            tempData.Add(auth);
         }
+        Data = tempData;
     }
 
     Author FillDataItem(AuthorEdit EditModel)
@@ -255,6 +257,7 @@
 
     async Task Grid_GenreDataItemDeleting(Genre genre) {
         Context.Remove<Genre>(genre);
+        Context.SaveChanges();
         await UpdateGenreDataAsync();
     }
 
@@ -268,7 +271,7 @@
         if(e.IsNew)
         {
             var genre = FillDataItem((Genre)e.EditModel);
-            await Context.AddAsync<Genre>(genre);
+            Context.Add<Genre>(genre);
         }
         else
         {
@@ -282,7 +285,6 @@
     Genre FillDataItem(Genre EditModel)
     {
         var DataItem = (Context.Genres.Where(x => x.Id == EditModel.Id).FirstOrDefault()) ?? new Genre();
-        DataItem.Id = Context.Genres.OrderByDescending(x => x.Id).FirstOrDefault()?.Id ?? 0 + 1; 
         DataItem.Name = EditModel.Name;
         return DataItem;
     }

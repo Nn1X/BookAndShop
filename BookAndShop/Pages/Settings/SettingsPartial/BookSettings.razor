@@ -79,6 +79,18 @@
                                         />
                                 </DxFormLayoutItem>
 
+                                 <DxFormLayoutItem Caption="Жанры:" ColSpanXl="5" ColSpanLg="5" ColSpanXs="5" Context="Book_FormLayoutContext">
+                                        <DxListBox Data="@Genres"
+                                           SizeMode="SizeMode.Small"
+                                           TextFieldName="@nameof(Genre.Name)"
+                                           SelectionMode="ListBoxSelectionMode.Multiple"
+                                           ShowCheckboxes="true"
+                                           CssClass="w-auto mt-1 mr-1 flex-grow-1 chi-220"
+                                           style="height:110px;"
+                                           @bind-Values="@book.IEnumGenres">
+                                        </DxListBox>
+                                </DxFormLayoutItem>
+
                                 <DxFormLayoutItem Caption="Описание:" ColSpanXl="12" ColSpanLg="12" ColSpanXs="12" Context="Book_FormLayoutContext">
                                         <DxMemo @bind-Text="@book.Description"
                                     Rows="5"/>
@@ -107,15 +119,26 @@
     DxGrid grid{ get; set; }
     List<Author> Authors{ get; set; }
     List<Image> Images{ get; set; }
+    List<Genre> Genres{ get; set; }
     object SelectedItem{ get; set; }
 
 
 
 
-    protected override async Task OnInitializedAsync() {
-        Data = Context.Books.Include(x => x.Author).Include(x => x.Image).ToList();
+    protected override async Task OnInitializedAsync()
+    {
+
+
+        Data = Context.Books.Include(x => x.Author).Include(x => x.Image).Include(x => x.Genres).ToList();
+
+
+        foreach (var item in Data)
+        {
+            item.IEnumGenres = item.Genres.ToList();
+        }
         Authors = Context.Authors.ToList();
         Images = Context.Images.ToList();
+        Genres = Context.Genres.ToList();
     }
 
     void Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e) {
@@ -138,16 +161,16 @@
         await UpdateDataAsync();
     }
 
-        async void OnRowEditStarting(Book book)
-        {
-            await grid.StartEditDataItemAsync(book);
-        }
-        async void OnRowCreateStarting()
-        {
-            await grid.StartEditNewRowAsync();
-        }
+    async void OnRowEditStarting(Book book)
+    {
+        await grid.StartEditDataItemAsync(book);
+    }
+    async void OnRowCreateStarting()
+    {
+        await grid.StartEditNewRowAsync();
+    }
 
-     async Task Grid_DataItemDeleting(Book e) {
+    async Task Grid_DataItemDeleting(Book e) {
         Context.Remove<Book>(e);
         await UpdateDataAsync();
     }
@@ -167,6 +190,8 @@
         DataItem.Description = EditModel.Description;
         DataItem.Image = EditModel.Image;
         DataItem.Price = EditModel.Price;
+        DataItem.IEnumGenres = EditModel.IEnumGenres;
+        DataItem.Genres = EditModel.IEnumGenres.ToHashSet();
     }
 
     async Task Grid_OnCancelButtonClick()
