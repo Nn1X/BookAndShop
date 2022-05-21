@@ -1,0 +1,101 @@
+﻿@page "/basket"
+@using BookAndShop.Services.BasketService
+@inject IBasketService service
+
+<div class="Cart-Wrapper">   
+    <div class="Cart-Container">
+        <div class="Cart-Header">
+             <h3 class="Cart-Heading">Корзина</h3>
+             <h5 class="Cart-Action" @onclick="RemoveAllBooks">Удалить всё</h5>
+        </div>
+
+         @foreach (var item in Data)
+         {
+             <div class="Cart-Items">
+                 <div class="image-box-Items">
+                    <img src="@item.ImagePath" style="height:120px" />
+                 </div>
+                 <div class="about-Items">
+                    <h1 class="title-Items">@item.BookTitle</h1>
+                    <h3 class="subtitle-Items">@item.Author</h3>
+                 </div>
+                 <div class="counter-Items">
+                     <div class="btn-Item" @onclick="(() => AddBook(item.BookId))">+</div>
+                     <div class="count-Item">@item.Count</div>
+                     <div class="btn-Item" @onclick="(() => RemoveBook(item.BookId))">-</div>
+                 </div>
+                 <div class="prices-Items">
+                     <div class="amount-Item">@((Convert.ToDecimal(item.Price * item.Count)+"₽").Replace(",","."))</div>
+                     <div class="remove-Item" @onclick="(() => RemoveAllCountBook(item.BookId))"><u>Удалить</u></div>
+                 </div>
+             </div>
+         }
+ 
+         <hr> 
+            <div class="checkout-Basket">
+            <div class="total-Basket">
+            <div>
+            <div class="Subtotal-Basket">Всего:</div>
+            <div class="items-Basket">@SetTotalBooks(Data.Count)</div>
+            </div>
+            <div class="total-amount-Basket">@(Data.Select(x => x.Price * x.Count).Sum()+"₽")</div>
+            </div>
+            <button class="button-Basket">Заказать</button>
+         </div>
+    </div>
+</div>
+
+@code{
+    List<BasketItem> Data = new List<BasketItem>();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadData();
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadData()
+    {
+        Data = await service.GetBasketItems();
+    }
+
+    private async Task AddBook(int id)
+    {
+        service.AddBasketItem(id);
+    }
+
+    private async Task RemoveBook(int id)
+    {
+        service.RemoveBasketItem(id);
+    }
+
+    private async Task RemoveAllCountBook(int id)
+    {
+        service.RemoveAllCountBasketItem(id);
+    }
+
+    private async Task RemoveAllBooks()
+    {
+        service.RemoveAllBasketItems();
+    }
+
+    private string SetTotalBooks(int count)
+    {
+        if (count == 11 || count == 12 || count == 13 || count == 14)
+            return $"{count} книг";
+
+        string result = (count % 10) switch
+        {    
+            1 => $"{count} книга",       
+            2 => $"{count} книги",       
+            3 => $"{count} книги",        
+            4 => $"{count} книги",      
+            _ => $"{count} книг"
+        };
+
+        return result;
+    }
+}
