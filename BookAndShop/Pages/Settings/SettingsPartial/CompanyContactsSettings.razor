@@ -1,0 +1,235 @@
+﻿@using BookAndShop.Models
+@using BookAndShop.Shared.Layouts
+@using DevExpress.Blazor
+@using System.Linq;
+@using Microsoft.EntityFrameworkCore;
+@using System.Globalization
+@using System.ComponentModel.DataAnnotations
+
+@inject MyDbContext Context;
+
+  <div>
+    <div class="editform__wrapper">
+        <EditForm Model="@Address"
+                  OnValidSubmit="@HandleValidSubmit"
+                  OnInvalidSubmit="@HandleInvalidSubmit"
+                  Context="EditFormContext"
+                  >
+            <DataAnnotationsValidator />
+            <div class="card-header text-center py-3">
+                <h4>Изменение контактных данных</h4>
+                <p class="tm-8 mb-0 font-weight-normal fs-825" style="text-align:center">
+                    Редактирование и просмотр данных
+                </p>
+            </div>
+            <div class="card-body">
+                <DxFormLayout CaptionPosition="CaptionPosition.Vertical">
+                    <DxFormLayoutItem ColSpanMd="12" Caption="Email адрес:">
+                        <Template Context="contextUserEdit">
+                            <DxTextBox @bind-Text="@Address.Email"
+                                       NullText="E-mail"
+                                       CssClass="editform__edititem"
+                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                            <div class="text-danger">
+                                <ValidationMessage For="@(() => Address.Email)" />
+                            </div>
+                        </Template>
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem ColSpanMd="12" Caption="Номер телефона:">
+                        <Template Context="contextUserEdit">
+                            <DxMaskedInput @bind-Value="@Address.Phone"
+                                           CssClass="editform__edititem"
+                                           Mask="@PhoneMask"
+                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                            <div class="text-danger">
+                                <ValidationMessage For="@(() => Address.Phone)" />
+                            </div>
+                        </Template>
+                    </DxFormLayoutItem>
+                    <p class="tm-8 mb-0 font-weight-normal fs-825" style="text-align:center;
+                            display: block;
+                            width: 100%;
+                            font-size: 19px;
+                            font-weight: 500 !important;
+                            margin-top:20px">
+                        Адрес компании:
+                    </p>
+                    <DxFormLayoutItem ColSpanMd="12" Caption="Город:">
+                        <Template Context="contextUserEdit">
+                            <DxTextBox @bind-Text="@Address.City"
+                                       CssClass="editform__edititem"
+                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" 
+                                       />
+                            <div class="text-danger">
+                                <ValidationMessage For="@(() => Address.City)" />
+                            </div>
+                        </Template>
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem ColSpanMd="12" Caption="Улица:">
+                        <Template Context="contextUserEdit">
+                            <DxTextBox @bind-Text="@Address.Street"
+                                       CssClass="editform__edititem"
+                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" 
+                                       />
+                            <div class="text-danger">
+                                <ValidationMessage For="@(() => Address.Street)" />
+                            </div>
+                        </Template>
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem ColSpanMd="6" Caption="Дом:">
+                        <Template Context="contextUserEdit">
+                            <DxTextBox @bind-Text="@Address.House"
+                                       CssClass="editform__edititem"
+                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" 
+                                       />
+                            <div class="text-danger">
+                                <ValidationMessage For="@(() => Address.House)" />
+                            </div>
+                        </Template>
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem ColSpanMd="6" Caption="Офис:">
+                        <Template Context="contextUserEdit">
+                            <DxTextBox @bind-Text="@Address.Office"
+                                       CssClass="editform__edititem"
+                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" 
+                                       />
+                            <div class="text-danger">
+                                <ValidationMessage For="@(() => Address.Office)" />
+                            </div>
+                        </Template>
+                    </DxFormLayoutItem>
+                     <p class="tm-8 mb-0 font-weight-normal fs-825" style="text-align:center;
+                            display: block;
+                            width: 100%;
+                            font-size: 19px;
+                            font-weight: 500 !important;
+                            margin-top:20px">
+                        Соц. Сети:
+                    </p>
+                    <DxFormLayoutItem ColSpanMd="12" Caption="VKontakte:">
+                        <Template Context="contextUserEdit">
+                            <DxTextBox @bind-Text="@Address.Vk"
+                                       CssClass="editform__edititem"
+                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" 
+                                       />
+                            <div class="text-danger">
+                                <ValidationMessage For="@(() => Address.Vk)" />
+                            </div>
+                        </Template>
+                    </DxFormLayoutItem>
+
+                    <DxFormLayoutItem ColSpanMd="12" Caption="Telegram:">
+                        <Template Context="contextUserEdit">
+                            <DxTextBox @bind-Text="@Address.Telegram"
+                                       CssClass="editform__edititem"
+                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" 
+                                       />
+                            <div class="text-danger">
+                                <ValidationMessage For="@(() => Address.Telegram)" />
+                            </div>
+                        </Template>
+                    </DxFormLayoutItem>
+
+                    <DxFormLayoutItem ColSpanMd="12" Caption="GitHub:">
+                        <Template Context="contextUserEdit">
+                            <DxTextBox @bind-Text="@Address.Github"
+                                       CssClass="editform__edititem"
+                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" 
+                                       />
+                            <div class="text-danger">
+                                <ValidationMessage For="@(() => Address.Github)" />
+                            </div>
+                        </Template>
+                    </DxFormLayoutItem>
+
+                    <DxFormLayoutItem ColSpanMd="12">
+                    <Template Context="contextUserEdit">
+                        <DxButton CssClass="editForm_button"
+                                  RenderStyle="ButtonRenderStyle.Primary"
+                                  SubmitFormOnClick="true"
+                                  Text="Изменить" />
+                    </Template>
+                </DxFormLayoutItem>
+                </DxFormLayout>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code{
+    private CompanyContactDetails ContactDetails { get; set; } = new CompanyContactDetails();
+    private CompanyAddress Address { get; set; } = new CompanyAddress();
+    private string number{ get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        ContactDetails = Context.CompanyContacts.FirstOrDefault();
+        if (ContactDetails.Address != null && ContactDetails.Address !="")
+        {
+            Address = new CompanyAddress(ContactDetails.Address, ContactDetails);
+        }
+        else
+        {
+            Address = new CompanyAddress(ContactDetails);
+        }
+    }
+    string PhoneMask { get; set; } = "(999) 000 0000";
+
+    void HandleValidSubmit() {
+        ContactDetails.Email = Address.Email;
+        ContactDetails.Phone = Address.Phone;
+        ContactDetails.Address = $"г. {Address.City}, ул. {Address.Street}, д. {Address.House}, офис {Address.Office}";
+        Context.Update(ContactDetails);
+        Context.SaveChanges();
+    }
+    void HandleInvalidSubmit() {
+    }
+
+    public class CompanyAddress
+    {
+        public CompanyAddress()
+        {
+        }
+        public CompanyAddress(CompanyContactDetails CompanyContacts)
+        {
+            Email = CompanyContacts.Email;
+            Phone = CompanyContacts.Phone;
+
+            Vk = CompanyContacts.Vk;
+            Telegram = CompanyContacts.Telegram;
+            Github = CompanyContacts.Github;
+        }
+        public CompanyAddress(string address, CompanyContactDetails CompanyContacts)
+        {
+            Email = CompanyContacts.Email;
+            Phone = CompanyContacts.Phone;
+
+            Vk = CompanyContacts.Vk;
+            Telegram = CompanyContacts.Telegram;
+            Github = CompanyContacts.Github;
+
+            var splitAddress = address.Split(", ");
+            City = splitAddress[0].Replace("г. ", "");
+            Street = splitAddress[1].Replace("ул. ", "");
+            House = splitAddress[2].Replace("д. ", "");
+            Office = splitAddress[3].Replace("офис ", "");        
+        }
+        [Required(ErrorMessage = "Email не указан!")]
+        public string Email{ get; set; }
+        public string Phone{ get; set; }
+        [Required(ErrorMessage = "Город не указан!")]
+        public string City{get;set;}
+        [Required(ErrorMessage = "Улица не указана!")]
+        public string Street { get; set; }
+        [Required(ErrorMessage = "Дом не указан!")]
+        public string House { get; set; }
+        [Required(ErrorMessage = "Офис не указан!")]
+        public string Office { get; set; }
+        [Url(ErrorMessage = "Не верный формат ссылки!")]
+        public string Vk { get; set; }
+        [Url(ErrorMessage = "Не верный формат ссылки!")]
+        public string Telegram { get; set; }
+        [Url(ErrorMessage = "Не верный формат ссылки!")]
+        public string Github { get; set; }
+    }
+}

@@ -1,0 +1,115 @@
+﻿@using BookAndShop.Models
+@using BookAndShop.Shared.Layouts
+@using DevExpress.Blazor
+@using System.Linq;
+@using Microsoft.EntityFrameworkCore;
+@using System.Globalization
+@inject IWebHostEnvironment Env
+@inject NavigationManager NavigationManager
+@inject MyDbContext Context;
+
+<div class="imgset_container">
+
+    <div class="imset_content">
+           <img src="/images/UploadImage.jpg" alt="" style="width:150px; margin-bottom: 35px;"/>
+
+            <button type="button" class="btn btn-success mb-2" style="display: block; margin: 0 auto; height: 14%; font-size: 12px; color: white !important;"
+				@onclick="() => AddImage()">Добавить</button>
+        </div>
+
+    @foreach (var item in Images)
+    {
+        <div class="imset_content">
+           <img src="@item.Path" alt="" style="width:150px; height:234px; margin-bottom: 15px;"/>
+
+            <button type="button" class="btn btn-info mb-2" style="display: block; margin: 0 auto; height: 14%; font-size: 12px; color: white !important;"
+				@onclick="() => RemoveImage(item)">Удалить</button>
+        </div>
+    }
+</div>
+
+
+
+<DxPopup
+    HeaderText="Загрузка"
+    Visible="@PopupVisible"
+    VisibleChanged="@(visible => VisibleChanged(visible))"
+    Width="50%">
+     <BodyTemplate>
+        <div id="overviewDemoDropZone" class="card custom-drop-zone jumbotron w-100 m-0">
+            <span class="drop-file-icon mb-3"></span>
+            <button id="overviewDemoSelectButton" class="btn border-primary btn-primary m-1"
+            style="width: 30%; margin: 0 auto !important; color: #fff !important;">
+                Выбрать файл
+            </button>
+            <span style="text-align: center; margin: 20px 0; font-size:20px;">Или перетащите файлы сюда...</span>
+        </div>
+        <DxUpload Name="myFile" Visible="@UploadVisible" ExternalSelectButtonCssSelector="#overviewDemoSelectButton" ExternalDropZoneCssSelector="#overviewDemoDropZone" MaxFileSize="15000000"
+            ExternalDropZoneDragOverCssClass="bg-light border-secondary text-dark"
+            UploadUrl="@GetUploadUrl("api/Upload/UploadFile/")"
+            SelectedFilesChanged="@SelectedFilesChanged"
+            CssClass="dxUpload_class"
+            AllowedFileExtensions="@(new List<string> { ".jpg", ".jpeg", ".gif", ".png" })"
+            AcceptedFileTypes="@(new List<string> { "image/*"})"
+            AllowMultiFileUpload="true">
+        </DxUpload>
+    </BodyTemplate>
+</DxPopup>
+
+
+@code
+{
+    List<Image> Images { get; set; }
+    protected override void OnInitialized()
+    {
+        LoadData();
+    }
+
+    private void LoadData()
+    {
+        Images = Context.Images.ToList();
+    }
+
+    private void RemoveImage(Image img)
+    {
+        try
+        {
+            var path = Path.Combine(Env.WebRootPath, img.Path);
+            File.Delete(path);
+            Context.Images.Remove(img);
+            Context.SaveChanges();
+            LoadData(); 
+        }
+        catch
+        {
+            //TODO: СДЕЛАТЬ ОШИБКУ
+        }
+
+    }
+    private void AddImage()
+    {
+        PopupVisible = true;
+    }
+
+
+    //UPLOADFILE
+
+    private void VisibleChanged(bool visible)
+    {
+        PopupVisible = visible;
+        LoadData();
+    }
+
+    bool PopupVisible{ get; set; }
+
+    bool UploadVisible { get; set; } = false;
+
+    protected void SelectedFilesChanged(IEnumerable<UploadFileInfo> files) {
+        UploadVisible = files.ToList().Count > 0;
+        InvokeAsync(StateHasChanged);
+    }
+    protected string GetUploadUrl(string url) {
+        var path = NavigationManager.ToAbsoluteUri(url).AbsoluteUri;
+        return path;
+    }
+}
