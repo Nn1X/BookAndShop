@@ -17,6 +17,7 @@ namespace BookAndShop.Models
         public virtual DbSet<Book> Books { get; set; } = null!;
         public virtual DbSet<Genre> Genres { get; set; } = null!;
         public virtual DbSet<Image> Images { get; set; } = null!;
+        public virtual DbSet<CompanyContactDetails> CompanyContacts { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -75,6 +76,32 @@ namespace BookAndShop.Models
 
                 entity.HasMany(d => d.Books)
                     .WithMany(p => p.Genres);
+            });
+
+            modelBuilder.Entity<CompanyContactDetails>(entity =>
+            {
+                entity.ToTable("CompanyContactDetails");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("Id");
+
+                entity.Property(e => e.Address)
+                    .HasColumnType("character varying");
+
+                entity.Property(e => e.Phone)
+                    .HasColumnType("character varying");
+
+                entity.Property(e => e.Email)
+                    .HasColumnType("character varying");
+
+                entity.Property(e => e.Vk)
+                    .HasColumnType("character varying");
+
+                entity.Property(e => e.Telegram)
+                    .HasColumnType("character varying");
+
+                entity.Property(e => e.Github)
+                    .HasColumnType("character varying");
             });
 
             modelBuilder.Entity<Image>(entity =>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BookAndShop.Models
 {
@@ -9,6 +10,7 @@ namespace BookAndShop.Models
         public Book()
         {
             Genres = new HashSet<Genre>();
+            IEnumGenres = Genres.ToList();
         }
 
         public int Id { get; set; }
@@ -21,7 +23,8 @@ namespace BookAndShop.Models
         public decimal Price { get; set; }
         public int IdImage { get; set; }
         public int IdAuthor { get; set; }
-
+        [NotMapped]
+        public IEnumerable<Genre> IEnumGenres { get; set; }
 
 
 
