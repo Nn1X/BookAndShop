@@ -67,9 +67,11 @@ Cart-Wrapper {
     width: 90%;
 }
 
+.about-Items__wrapper{
+    text-align:center;
+}
 .title-Items {
     padding-top: 5px;
-    text-align: center;
     width: 90%;
     /*line-height: 10px;*/
     font-size: 24px;
@@ -81,7 +83,6 @@ Cart-Wrapper {
 .subtitle-Items {
     line-height: 10px;
     font-size: 14px;
-    text-align: center;
     font-family: ‘Lato’;
     font-weight: 600;
     color: #909090;

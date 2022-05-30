@@ -16,8 +16,10 @@
                     <img src="@item.ImagePath" style="height:120px" />
                  </div>
                  <div class="about-Items">
-                    <h1 class="title-Items">@item.BookTitle</h1>
-                    <h3 class="subtitle-Items">@item.Author</h3>
+                     <div class="about-Items__wrapper">
+                        <h1 class="title-Items">@item.BookTitle</h1>
+                        <h3 class="subtitle-Items">@item.Author</h3>
+                     </div>
                  </div>
                  <div class="counter-Items">
                      <div class="btn-Item" @onclick="(() => AddBook(item.BookId))">+</div>
