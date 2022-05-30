@@ -5,19 +5,51 @@
 @inject IJSRuntime JSRuntime
 @inject MyDbContext context
 
+		<div class="form-inline">
+		<div style="display:inline-block; margin: 20px 2px;">
+			<div 
+				style="display:inline-block">
+				Сортировки:
+			</div>
+			<div 
+				style="display:inline-block; margin-left:20px; cursor: pointer;
+					-moz-user-select: none;
+					-khtml-user-select: none;
+					user-select: none;"
+				@onclick="@SortByPrice">
+				@SortByPriceText
+			</div>
+			<div 
+				style="display:inline-block; margin-left:20px; cursor: pointer;
+					-moz-user-select: none;
+					-khtml-user-select: none;
+					user-select: none;"
+				@onclick="@SortByTitle">
+				@SortByTitleText
+			</div>
+		</div>
 
+		<label class="sr-only" for="filter-name">Поиск</label>
+		<input type="text" class="form-control mb-2 mr-sm-2" style="width:82%"
+			   @bind="nameFilter"
+			   placeholder="Поиск по названию" />
+		<button type="button" class="btn btn-primary mr-sm-2 mb-2" style="color:white !important;"
+				@onclick="Filter">Поиск</button>
+		<button type="button" class="btn btn-secondary mb-2"
+				@onclick="Clear">Сбросить</button>
+	</div>
 
 	<!-- Posts -->
 		<section class="posts">
 			@foreach (Book book in Books)
 			{
 				<article>
-					<header>
+					<header class="Book-Header">
 						<span class="date">@(book.Date == null ? "" : book.Date.Value.ToString("dd MMMM, yyyy"))</span>
 						<h2><a href="/book/@book.Id">@book.Title</a></h2>
 					</header>
 					<a href="/book/@book.Id" class="image fit"><img src="@book.Image.Path" alt="" /></a>
-					<p>@book.Description</p>
+					<p class="Book-Price">@book.Price₽</p>
 					<ul class="actions special">
 						<li><a href="/book/@book.Id" class="button">Просмотр</a></li>
 					</ul>
@@ -33,14 +65,23 @@
 
 
 
+
+
 @code{
 	List<Book> Books { get; set; }
 	private int totalPageQuantity;
 	private int currentPage = 1;
+	private string nameFilter = string.Empty;
 
-	protected override void OnInitialized()
+	private bool? SortByPriceDesc{ get; set; }
+	private string SortByPriceText { get; set; } = "По цене";
+
+	private bool? SortByTitleDesc{ get; set; }
+	private string SortByTitleText { get; set; } = "По названию";
+
+	protected override async Task OnInitializedAsync()
 	{
-		LoadBooks();
+		await LoadBooks();
 	}
 
 	private async Task SelectedPage(int page)
@@ -49,11 +90,100 @@
 		await LoadBooks(page);
 	}
 
-	async Task LoadBooks(int page = 1, int quantityPerPage = 1)
+	private async Task Filter()
 	{
-		var ceiling = Math.Ceiling(Convert.ToDouble(context.Books.Count()) / quantityPerPage);
+		currentPage = 1;
+		await LoadBooks();
+	}
+
+	private async Task Clear()
+	{
+		nameFilter = string.Empty;
+		currentPage = 1;
+		await LoadBooks();
+	}
+
+	private async Task SortByPrice()
+	{
+		switch(SortByPriceDesc)
+		{
+			case null:
+				{
+					SortByPriceDesc = false;
+					SortByPriceText = "По цене🠑";
+					break;
+				}
+			case false:
+				{
+					SortByPriceDesc = true;
+					SortByPriceText = "По цене🠓";
+					break;
+				}
+			case true:
+				{
+					SortByPriceDesc = null;
+					SortByPriceText = "По цене";
+					break;
+				}
+		}
+		await LoadBooks();
+		StateHasChanged();
+	}
+
+	private async Task SortByTitle()
+	{
+		switch(SortByTitleDesc)
+		{
+			case null:
+				{
+					SortByTitleDesc = false;
+					SortByTitleText = "По названию🠑";
+					break;
+				}
+			case false:
+				{
+					SortByTitleDesc = true;
+					SortByTitleText = "По названию🠓";
+					break;
+				}
+			case true:
+				{
+					SortByTitleDesc = null;
+					SortByTitleText = "По названию";
+					break;
+				}
+		}
+		await LoadBooks();
+		StateHasChanged();
+	}
+
+	async Task LoadBooks(int page = 1, int quantityPerPage = 8)
+	{
+		var queryable = context.Books.Include(x => x.Image).Include(x => x.Genres).AsQueryable();
+		if (!string.IsNullOrEmpty(nameFilter))
+		{
+			queryable = queryable.Where(x => x.Title.ToUpper().Contains(nameFilter.ToUpper()));
+		}
+
+		if(SortByPriceDesc != null)
+		{
+			if (SortByPriceDesc.Value)
+				queryable = queryable.OrderByDescending(x => x.Price);
+			else
+				queryable = queryable.OrderBy(x => x.Price);
+		}
+
+		if(SortByTitleDesc != null)
+		{
+			if (SortByTitleDesc.Value)
+				queryable = queryable.OrderByDescending(x => x.Title);
+			else
+				queryable = queryable.OrderBy(x => x.Title);
+		}
+
+		var ceiling = Math.Ceiling(Convert.ToDouble(queryable.Count()) / quantityPerPage);
 		totalPageQuantity = Convert.ToInt32(ceiling);
 
-		Books = context.Books.Include(x => x.Image).Include(x => x.Genres).AsQueryable().Skip((page-1) * quantityPerPage).Take(quantityPerPage).ToList();
+		Books = queryable.Skip((page-1) * quantityPerPage).Take(quantityPerPage).ToList();
 	}
 }

@@ -1,0 +1,11 @@
+﻿
+
+.Book-Header{
+    height:12%;
+}
+.Book-Price {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 200;
+    margin-bottom: 30px;
+}
