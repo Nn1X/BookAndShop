@@ -1,26 +1,119 @@
 ﻿@page "/account"
 
+@using BookAndShop.Models
+@using DevExpress.Blazor
 @using Microsoft.AspNetCore.Components.Authorization
 @using BookAndShop.Data
+@using Microsoft.AspNetCore.Identity
+@using System.ComponentModel.DataAnnotations
 @inject NavigationManager Navigation
 @inject TokenProvider TokenProvider
 @inject BookAndShopContext idContext
-
+@inject UserManager<User> userManager 
+@inject AuthenticationStateProvider AuthenticationStateProvider
 <AuthorizeView>
     <Authorized>
         <div>
-            <p>
-                Авторизован @context.User.Identity.Name
-            </p>
-            <p>
-                 @idContext.Users.Where(x => x.Email ==  @context.User.Identity.Name).FirstOrDefault().Id.ToString();
-            </p>
+    <div class="editform__wrapper">
+        <EditForm Model="@Address"
+                  OnValidSubmit="@HandleValidSubmit"
+                  OnInvalidSubmit="@HandleInvalidSubmit"
+                  Context="EditFormContext"
+                  >
+            <DataAnnotationsValidator />
+            <div class="card-header text-center py-3">
+                <h4>Изменение данных пользователя</h4>
+                <p class="tm-8 mb-0 font-weight-normal fs-825" style="text-align:center">
+                    Редактирование и просмотр данных
+                </p>
+            </div>
+            <div class="card-body">
+                <DxFormLayout CaptionPosition="CaptionPosition.Vertical">
+                    <DxFormLayoutItem ColSpanMd="12" Caption="Email адрес:">
+                        <Template Context="contextUserEdit">
+                            <DxTextBox @bind-Text="@Address.Email"
+                                       NullText="E-mail"
+                                       CssClass="editform__edititem"
+                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" 
+                                       ReadOnly="true"/>
+                            <div class="text-danger">
+                                <ValidationMessage For="@(() => Address.Email)" />
+                            </div>
+                        </Template>
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem ColSpanMd="12" Caption="Номер телефона:">
+                        <Template Context="contextUserEdit">
+                            <DxMaskedInput @bind-Value="@Address.Phone"
+                                           CssClass="editform__edititem"
+                                           Mask="@PhoneMask"
+                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                            <div class="text-danger">
+                                <ValidationMessage For="@(() => Address.Phone)" />
+                            </div>
+                        </Template>
+                    </DxFormLayoutItem>
+                    <p class="tm-8 mb-0 font-weight-normal fs-825" style="text-align:center; text-align: center;
+                            display: block;
+                            width: 100%;
+                            font-size: 19px;
+                            font-weight: 500 !important;">
+                        Адрес доставки:
+                    </p>
+                    <DxFormLayoutItem ColSpanMd="12" Caption="Город:">
+                        <Template Context="contextUserEdit">
+                            <DxTextBox @bind-Text="@Address.City"
+                                       CssClass="editform__edititem"
+                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" 
+                                       />
+                            <div class="text-danger">
+                                <ValidationMessage For="@(() => Address.City)" />
+                            </div>
+                        </Template>
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem ColSpanMd="12" Caption="Улица:">
+                        <Template Context="contextUserEdit">
+                            <DxTextBox @bind-Text="@Address.Street"
+                                       CssClass="editform__edititem"
+                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" 
+                                       />
+                            <div class="text-danger">
+                                <ValidationMessage For="@(() => Address.Street)" />
+                            </div>
+                        </Template>
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem ColSpanMd="6" Caption="Дом:">
+                        <Template Context="contextUserEdit">
+                            <DxTextBox @bind-Text="@Address.House"
+                                       CssClass="editform__edititem"
+                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" 
+                                       />
+                            <div class="text-danger">
+                                <ValidationMessage For="@(() => Address.House)" />
+                            </div>
+                        </Template>
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem ColSpanMd="6" Caption="Квартира:">
+                        <Template Context="contextUserEdit">
+                                       <DxSpinEdit @bind-Value="@Address.Flat"
+                                        CssClass="editform__edititem" />
+                            <div class="text-danger">
+                                <ValidationMessage For="@(() => Address.Flat)" />
+                            </div>
+                        </Template>
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem ColSpanMd="12">
+                    <Template Context="contextUserEdit">
+                        <DxButton CssClass="editForm_button"
+                                  RenderStyle="ButtonRenderStyle.Primary"
+                                  SubmitFormOnClick="true"
+                                  Text="Изменить" />
+                    </Template>
+                </DxFormLayoutItem>
+                </DxFormLayout>
+            </div>
+        </EditForm>
+    </div>
         </div>
-        @*<form action="/Identity/Account/Logout?returnUrl=%2F" method="post">
-            <button class="nav-link btn btn-link" type="submit">Logout</button>
-            <input name="__RequestVerificationToken" type="hidden"
-                   value="@TokenProvider.XsrfToken">
-        </form>*@
     </Authorized>
     <NotAuthorized>
         <div>
@@ -32,3 +125,76 @@
         <a href="auth/login">Login</a>
     </NotAuthorized>
 </AuthorizeView>
+
+
+@code{
+    private User CurrentUser { get; set; } = new User();
+    private UserAddress Address { get; set; } = new UserAddress();
+    private string number{ get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        var state = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        if (!state.User.Identity.IsAuthenticated)
+        {
+            return;
+        }
+
+        CurrentUser = await userManager.FindByNameAsync(state.User.Identity.Name);
+        if (CurrentUser.Address != null && CurrentUser.Address !="")
+        {
+            Address = new UserAddress(CurrentUser.Address, CurrentUser);
+        }
+        else
+        {
+            Address = new UserAddress(CurrentUser);
+        }
+
+
+
+    }
+    string PhoneMask { get; set; } = "(999)000-0000";
+
+    void HandleValidSubmit() {
+        CurrentUser.PhoneNumber = Address.Phone;
+        CurrentUser.Address = $"{Address.City}, {Address.Street}, {Address.House}, {Address.Flat}";
+        idContext.Update(CurrentUser);
+        idContext.SaveChanges();
+    }
+    void HandleInvalidSubmit() {
+    }
+
+    public class UserAddress
+    {
+        public UserAddress()
+        {
+        }
+        public UserAddress(User user)
+        {
+            Email = user.Email;
+            Phone = user.PhoneNumber;
+        }
+        public UserAddress(string address, User user)
+        {
+            Email = user.Email;
+            Phone = user.PhoneNumber;
+
+            var splitAddress = address.Split(',');
+            City = splitAddress[0].TrimStart(' ');
+            Street = splitAddress[1].TrimStart(' ');
+            House = splitAddress[2].TrimStart(' ');
+            Flat = int.Parse(splitAddress[3].TrimStart(' '));        
+        }
+        [Required(ErrorMessage = "Email не указан!")]
+        public string Email{ get; set; }
+        public string Phone{ get; set; }
+        [Required(ErrorMessage = "Город не указан!")]
+        public string City{get;set;}
+        [Required(ErrorMessage = "Улица не указана!")]
+        public string Street { get; set; }
+        [Required(ErrorMessage = "Дом не указан!")]
+        public string House { get; set; }
+        [Required(ErrorMessage = "Квартира не указана!")]
+        public int Flat { get; set; }
+    }
+}
