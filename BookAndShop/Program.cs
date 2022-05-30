@@ -13,7 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseWebRoot("wwwroot").UseStaticWebAssets();
 var connectionString = builder.Configuration.GetConnectionString("BookAndShopContextConnection");builder.Services.AddDbContext<BookAndShopContext>(options =>
     options.UseNpgsql("Host=localhost; Port=5432; User Id=postgres; Password=sa; Database=BookShop")); builder.Services.AddDefaultIdentity<User>(options => { 
-    options.SignIn.RequireConfirmedAccount = false;
+    options.SignIn.RequireConfirmedAccount = true;
     options.Password.RequiredLength = 5;   // минимальная длина
     options.Password.RequireNonAlphanumeric = false;   // требуются ли не алфавитно-цифровые символы
     options.Password.RequireLowercase = false; // требуются ли символы в нижнем регистре
@@ -25,10 +25,13 @@ var connectionString = builder.Configuration.GetConnectionString("BookAndShopCon
 builder.Services.AddDbContext<MyDbContext>(options =>
     options.UseNpgsql("Host=localhost; Port=5432; User Id=postgres; Password=sa; Database=BookShop"));
 
+
+
 builder.Services.AddScoped<TokenProvider>();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddDevExpressBlazor();
+builder.Services.AddControllers();
 
 builder.Services.AddScoped<IBasketService, BasketService>();
 
@@ -45,6 +48,13 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+var supportedCultures = new[] { "ru-RU" };
+var localizationOptions = new RequestLocalizationOptions().SetDefaultCulture(supportedCultures[0])
+    .AddSupportedCultures(supportedCultures)
+    .AddSupportedUICultures(supportedCultures);
+
+app.UseRequestLocalization(localizationOptions);
+
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
@@ -53,6 +63,9 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapBlazorHub();
+
+app.MapControllers();
+
 app.MapFallbackToPage("/_Host");
 
 app.Run();
