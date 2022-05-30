@@ -1,9 +1,11 @@
 ﻿@using BookAndShop.Data
+@using BookAndShop.Models
 @using BookAndShop.LayoutServices
 @using BookAndShop.Shared
 @inherits LayoutComponentBase
 @inject NavigationManager navigationManager
 @inject TokenProvider TokenProvider
+@inject MyDbContext context
 @inject BookAndShopContext idContext
 
 @*<PageTitle>BookAndShop</PageTitle>
@@ -164,25 +166,23 @@
 				</section>*@
 				<section class="split contact">
 					<section class="alt">
-						<h3>Address</h3>
-						<p>1234 Somewhere Road #87257<br />
-						Nashville, TN 00000-0000</p>
+						<h3>Адрес</h3>
+						<p>@Contacts.Address</p>
 					</section>
 					<section>
-						<h3>Phone</h3>
-						<p><a href="#">(000) 000-0000</a></p>
+						<h3>Телефон</h3>
+						<p><a>+7 @Contacts.Phone</a></p>
 					</section>
 					<section>
 						<h3>Email</h3>
-						<p><a href="#">info@untitled.tld</a></p>
+						<p><a>@Contacts.Email</a></p>
 					</section>
 					<section>
-						<h3>Social</h3>
+						<h3>Соц. сети</h3>
 						<ul class="icons alt">
-							<li><a href="#" class="icon brands alt fa-twitter"><span class="label">Twitter</span></a></li>
-							<li><a href="#" class="icon brands alt fa-facebook-f"><span class="label">Facebook</span></a></li>
-							<li><a href="#" class="icon brands alt fa-instagram"><span class="label">Instagram</span></a></li>
-							<li><a href="#" class="icon brands alt fa-github"><span class="label">GitHub</span></a></li>
+							<li><a href="@Contacts.Vk" class="icon brands alt fa-vk" target="_blank"><span class="label">VK</span></a></li>
+							<li><a href="@Contacts.Telegram" class="icon brands alt fa-telegram" target="_blank"><span class="label">Telegram</span></a></li>
+							<li><a href="@Contacts.Github" class="icon brands alt fa-github" target="_blank"><span class="label">GitHub</span></a></li>
 						</ul>
 					</section>
 				</section>
@@ -198,6 +198,7 @@
 @code{
 	string Url { get; set; } = "/";
 	bool active{ get; set; }
+	CompanyContactDetails Contacts { get; set; } = new CompanyContactDetails();
 
 	void urlChanged(string url)
 	{
@@ -206,6 +207,7 @@
 	}
 	protected override void OnInitialized()
 	{
+		Contacts = context.CompanyContacts.FirstOrDefault();
 		active = true;
 		CountService.Count = 0;
 	}
