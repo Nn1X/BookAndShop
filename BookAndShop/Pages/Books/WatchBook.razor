@@ -1,8 +1,10 @@
 ﻿@page "/book"
 @page "/book/{bookId:int}"
 @using BookAndShop.Models
+@using BookAndShop.Services.BasketService
 @using Microsoft.EntityFrameworkCore
 @inject MyDbContext context
+@inject IBasketService basketService
 
 <section class="post">
 	<header class="major">
@@ -11,8 +13,21 @@
 		<p>@book.Author.Fio</p>
 	</header>
 	<div class="image main"><img src="@book.Image.Path" alt="" /></div>
-	<p>@book.Description</p>
-@*	<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis dapibus rutrum facilisis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Etiam tristique libero eu nibh porttitor fermentum. Nullam venenatis erat id vehicula viverra. Nunc ultrices eros ut ultricies condimentum. Mauris risus lacus, blandit sit amet venenatis non, bibendum vitae dolor. Nunc lorem mauris, fringilla in aliquam at, euismod in lectus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. In non lorem sit amet elit placerat maximus. Pellentesque aliquam maximus risus. Donec eget ex magna. Interdum et malesuada fames ac ante ipsum primis in faucibus. Pellentesque venenatis dolor imperdiet dolor mattis sagittis. Praesent rutrum sem diam, vitae egestas enim auctor sit amet. Pellentesque leo mauris, consectetur id ipsum.</p>*@
+	<p style="margin-top:20px;">@book.Description</p>
+	
+	<div style="text-align:center;">
+		<ul class="actions special" style="margin-top:40px; position:relative; z-index:2;" @onclick="() => AddBook(book)">
+			<li><a class="button">Добавить в корзину</a></li>
+		</ul>
+		@*<lord-icon
+			src="https://cdn.lordicon.com/xhdhjyqy.json"
+			trigger="loop"
+			colors="primary:black,secondary:#08a88a"
+			style="width:60px;height:60px; margin-left:65%; margin-top:-87px; display:none; z-index:1"
+			id="animclick">
+		</lord-icon>*@
+	</div>
+	<img src=/images/check.svg style="width:60px;height:60px; margin-left:65%; margin-top:-87px; display:none; z-index:1" id="animclick"/>
 </section>
 
 
@@ -20,12 +35,19 @@
 @code{
 	[Parameter]
 	public int bookId{ get; set; }
-
+	[Inject]
+	IJSRuntime JS{ get; set; }
 	private Book? book{ get; set; }
 
 	protected override void OnInitialized()
 	{
 		book = context.Books.Where(x => x.Id == bookId).Include(x => x.Image).Include(x => x.Author).FirstOrDefault();
+	}
+
+	private async void AddBook(Book book)
+	{
+		basketService.AddBasketItem(book);
+		await JS.InvokeVoidAsync("AddBookClick");
 	}
 
 }
