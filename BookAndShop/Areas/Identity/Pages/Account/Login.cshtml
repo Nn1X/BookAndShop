@@ -2,8 +2,7 @@
 @model LoginModel
 
 @{
-    ViewData["Title"] = "Вход";
-
+	ViewData["Title"] = "Вход";
 }
 <div class="limiter">
 		<div class="container-login100">
@@ -24,9 +23,22 @@
 						Пароль
 					</span>
 					<div class="wrap-input100 validate-input m-b-12" data-validate = "Password is required">
-						<input asp-for="Input.Password" style="border:0px!important;" class="input100" autocomplete="current-password" aria-required="true" />
+
+						<span class="btn-show-pass" onclick="myFunction()">
+													<script src="https://cdn.lordicon.com/xdjxvujz.js"></script>
+						<lord-icon
+							src="https://cdn.lordicon.com/tyounuzx.json"
+							trigger="hover"
+							colors="primary:#121331,secondary:#08a88a"
+							stroke="40"
+							style="width:40px;height:40px">
+						</lord-icon>
+							@*<i class="bi bi-eye" id="myEye" style="font-size: 25px;"></i>*@
+						</span>
+
+						<input asp-for="Input.Password" style="border:0px!important;" class="input100" autocomplete="current-password" aria-required="true" id="myInputPass" type="password"/>
 						<span class="focus-input100"></span>
-					</div
+					</div>
 
 					<span class="txt1 p-b-11" style="margin: 0 auto; color:red; display: block;">
 						<div asp-validation-summary="All" class="text-danger"></div>
@@ -54,7 +66,19 @@
 	
 
 	<div id="dropDownSelect1"></div>
-
+	<script>
+		function myFunction() {
+		  var x = document.getElementById("myInputPass");
+		  var z = document.getElementById("myEye");
+		  if (x.type === "password") {
+			x.type = "text";
+			z.className = "bi bi-eye-slash";
+		  } else {
+			x.type = "password";
+			z.className = "bi bi-eye";
+		  }
+		}
+	</script>
 	@section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }

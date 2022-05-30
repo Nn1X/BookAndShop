@@ -81,6 +81,10 @@ namespace BookAndShop.Areas.Identity.Pages.Account
                 {
                     return LocalRedirect(returnUrl);
                 }
+                else if(result.IsNotAllowed)
+                {
+                    ModelState.AddModelError(string.Empty, "Аккаунт не подтвержден, проверьте электронную почту!");
+                }
                 else
                 {
                     ModelState.AddModelError(string.Empty, "Неверный логин или пароль!");
@@ -109,6 +113,23 @@ namespace BookAndShop.Areas.Identity.Pages.Account
                 }
             }
             return true;
+        }
+
+        string PassType { get; set; } = "password";
+        string Eyes { get; set; } = "fa fa-eye";
+
+        private void ShowPass()
+        {
+            if (PassType == "text")
+            {
+                PassType = "password";
+                Eyes = "fa fa-eye";
+            }
+            else
+            {
+                PassType = "text";
+                Eyes = "fa fa-eye-slash";
+            }
         }
     }
 }
